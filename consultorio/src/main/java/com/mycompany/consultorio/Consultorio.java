@@ -1,249 +1,245 @@
 package com.mycompany.consultorio;
 
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 public class Consultorio {
 
-    static List<medico> listamedico = new ArrayList<>();
-    static List<paciente> listapaciente = new ArrayList<>();
-    static List<cita> listacitas = new ArrayList<>();
+    private static final String ARCHIVO_MEDICOS = "medicos.csv";
+    private static final String ARCHIVO_PACIENTES = "pacientes.csv";
+    private static final String ARCHIVO_CITAS = "citas.csv";
+
+    private static List<Medico> medicos = new ArrayList<>();
+    private static List<Paciente> pacientes = new ArrayList<>();
+    private static List<Cita> citas = new ArrayList<>();
 
     public static void main(String[] args) {
-        Scanner entrada = new Scanner(System.in);
-        String usuario;
-        String contrasena;
-        System.out.println("Bienvenido al programa para dar de alta tu cita");
-        System.out.println("Inicia sesion para continuar");
-        System.out.println("Usuario: ");
-        usuario = entrada.nextLine();
-        System.out.println("Contraseña: ");
-        contrasena = entrada.nextLine();
-        System.out.println("");
-        if (ValidarUsuario(usuario, contrasena)) {
-            System.out.println("Bienvenido: " + usuario);
-            menu();
-            transacciones();
-        } else {
-            System.out.println("Usuario / Contraseña incorrecta. Favor de validar.");
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Usuario: ");
+        String usuario = sc.nextLine();
+        System.out.print("Contraseña: ");
+        String password = sc.nextLine();
+
+        if (!usuario.equals("admin") || !password.equals("root")) {
+            System.out.println("Credenciales incorrectas. Saliendo...");
+            return;
         }
-    }
 
-    static boolean ValidarUsuario(String usuario, String contrasena) {
-        String usuariolocal = "admin";
-        String contrasenalocal = "root";
-        return usuariolocal.equals(usuario) && contrasenalocal.equals(contrasena);
-    }
+        cargarMedicos();
+        cargarPacientes();
+        cargarCitas();
 
-    static void menu() {
-        System.out.println("Seleccione una opcion");
-        System.out.println("1.-Dar de alta un medico");
-        System.out.println("2.-Dar de alta un paciente");
-        System.out.println("3.-Crear Cita");
-        System.out.println("4.-Lista de medicos");
-        System.out.println("5.-Lista de pacientes");
-        System.out.println("6.-Lista de citas");
-    }
-
-    static void transacciones() {
-        Scanner entrada = new Scanner(System.in);
         int opcion;
-        System.out.print("Ingrese el numero de operacion a realizar: ");
-        opcion = entrada.nextInt();
-        entrada.nextLine();
-
-        switch (opcion) {
-            case 1:
-                System.out.println("Alta de medico");
-                altamedico();
-                break;
-            case 2:
-                System.out.println("Alta de paciente");
-                AltaPaciente();
-                break;
-            case 3:
-                System.out.println("Crear Cita");
-                CrearCita();
-                break;
-            case 4:
-                System.out.println("Lista de medicos");
-                listarMedicos();
-                break;
-            case 5:
-                System.out.println("Lista de pacientes");
-                ListaPacientes();
-                break;
-            case 6:
-                System.out.println("Lista de citas");
-                ListaCitas();
-                break;
-        }
-    }
-
-    static void altamedico() {
-        Scanner entrada = new Scanner(System.in);
-        String respuesta;
-
         do {
-            medico medico = new medico();
-            System.out.print("Ingrese el ID del medico: ");
-            medico.id = entrada.nextInt();
-            entrada.nextLine();
-            System.out.print("Ingrese el Nombre del medico: ");
-            medico.nombre = entrada.nextLine();
-            System.out.print("Ingresa la especialidad: ");
-            medico.especialidad = entrada.nextLine();
-            listamedico.add(medico);
-            System.out.println("medico registrado");
+            System.out.println("\n1. Registrar médico");
+            System.out.println("2. Registrar paciente");
+            System.out.println("3. Registrar cita");
+            System.out.println("4. Mostrar médicos");
+            System.out.println("5. Mostrar pacientes");
+            System.out.println("6. Mostrar citas");
+            System.out.println("0. Salir");
+            System.out.print("Seleccione una opción: ");
+            opcion = Integer.parseInt(sc.nextLine());
 
-            System.out.print("dar de alta otro medico? (si/no): ");
-            respuesta = entrada.nextLine();
-
-        } while (respuesta.equalsIgnoreCase("si"));
-        menu();
-        transacciones();
-    }
-
-    static void AltaPaciente() {
-        Scanner entrada = new Scanner(System.in);
-        String respuesta;
-
-        do {
-            paciente paciente = new paciente();
-            System.out.print("Ingrese el ID del paciente: ");
-            paciente.id = entrada.nextInt();
-            entrada.nextLine();
-            System.out.print("Ingrese el Nombre del paciente: ");
-            paciente.nombre = entrada.nextLine();
-            listapaciente.add(paciente);
-            System.out.println("Paciente registrado");
-            System.out.print("agregar otro paciente? (si/no): ");
-            respuesta = entrada.nextLine();
-        } while (respuesta.equalsIgnoreCase("si"));
-        menu();
-        transacciones();
-    }
-
-    static void CrearCita() {
-        Scanner entrada = new Scanner(System.in);
-
-        if (listamedico.isEmpty() || listapaciente.isEmpty()) {
-            System.out.println("Registre pacientes antes de crear citas");
-            menu();
-            transacciones();
-            return;
-        }
-
-        cita nuevaCita = new cita();
-
-        System.out.print("Ingrese el ID de la cita: ");
-        nuevaCita.id = entrada.nextInt();
-        entrada.nextLine();
-        System.out.print("Ingrese la fecha de la cita (DD/MM/AAAA): ");
-        nuevaCita.fecha = entrada.nextLine();
-        System.out.print("Ingrese la hora de la cita (HH:MM): ");
-        nuevaCita.hora = entrada.nextLine();
-        System.out.print("Ingrese el motivo de la cita: ");
-        nuevaCita.motivo = entrada.nextLine();
-
-        System.out.println("Lista de medicoss:");
-        for (medico m : listamedico) {
-            System.out.println("ID: " + m.id + " | Nombre: " + m.nombre + " | Especialidad: " + m.especialidad);
-        }
-        System.out.print("Ingrese el ID del medico para esta cita: ");
-        int idMedico = entrada.nextInt();
-        entrada.nextLine();
-
-        medico medicoSeleccionado = null;
-        for (medico m : listamedico) {
-            if (m.id == idMedico) {
-                medicoSeleccionado = m;
-                break;
+            switch (opcion) {
+                case 1 -> registrarMedico(sc);
+                case 2 -> registrarPaciente(sc);
+                case 3 -> registrarCita(sc);
+                case 4 -> mostrarMedicos();
+                case 5 -> mostrarPacientes();
+                case 6 -> mostrarCitas();
+                case 0 -> System.out.println("Saliendo...");
+                default -> System.out.println("Opción no válida.");
             }
-        }
+        } while (opcion != 0);
+    }
 
-        if (medicoSeleccionado == null) {
-            System.out.println("Medico no encontrado.");
-            menu();
-            transacciones();
+private static void registrarMedico(Scanner sc) {
+    System.out.print("Nombre del médico: ");
+    String nombre = sc.nextLine();
+    System.out.print("Especialidad: ");
+    String especialidad = sc.nextLine();
+    int id = medicos.size() + 1;
+    medicos.add(new Medico(id, nombre, especialidad));
+
+    List<String[]> datos = new ArrayList<>();
+    datos.add(new String[]{String.valueOf(id), nombre, especialidad});
+    guardarCSV(ARCHIVO_MEDICOS, datos, new String[]{"ID", "Nombre", "Especialidad"});
+
+    System.out.println("Médico registrado con ID " + id);
+}
+
+
+private static void registrarPaciente(Scanner sc) {
+    System.out.print("Nombre del paciente: ");
+    String nombre = sc.nextLine();
+    int id = pacientes.size() + 1;
+    pacientes.add(new Paciente(id, nombre));
+
+    List<String[]> datos = new ArrayList<>();
+    datos.add(new String[]{String.valueOf(id), nombre});
+    guardarCSV(ARCHIVO_PACIENTES, datos, new String[]{"ID", "Nombre"});
+
+    System.out.println("Paciente registrado con ID " + id);
+}
+
+
+    private static void registrarCita(Scanner sc) {
+    if (medicos.isEmpty()) {
+        System.out.println("No hay médicos registrados.");
+        return;
+    }
+    if (pacientes.isEmpty()) {
+        System.out.println("No hay pacientes registrados.");
+        return;
+    }
+
+    System.out.println("Médicos disponibles:");
+    for (Medico m : medicos) {
+        System.out.println(m.getId() + ". " + m.getNombre() + " (" + m.getEspecialidad() + ")");
+    }
+    System.out.print("Seleccione el ID del médico: ");
+    int idMedico = Integer.parseInt(sc.nextLine());
+    Medico medico = medicos.stream().filter(m -> m.getId() == idMedico).findFirst().orElse(null);
+    if (medico == null) {
+        System.out.println("Médico no encontrado.");
+        return;
+    }
+
+    System.out.println("Pacientes disponibles:");
+    for (Paciente p : pacientes) {
+        System.out.println(p.getId() + ". " + p.getNombre());
+    }
+    System.out.print("Seleccione el ID del paciente: ");
+    int idPaciente = Integer.parseInt(sc.nextLine());
+    Paciente paciente = pacientes.stream().filter(p -> p.getId() == idPaciente).findFirst().orElse(null);
+    if (paciente == null) {
+        System.out.println("Paciente no encontrado.");
+        return;
+    }
+
+    System.out.print("Fecha y hora (ej. 2025-06-03 15:00): ");
+    String fechaHora = sc.nextLine();
+    System.out.print("Motivo de la cita: ");
+    String motivo = sc.nextLine();
+
+    int id = citas.size() + 1;
+    Cita cita = new Cita(id, fechaHora, motivo, idMedico, idPaciente);
+    citas.add(cita);
+
+    List<String[]> datos = new ArrayList<>();
+    datos.add(new String[]{String.valueOf(id), fechaHora, motivo, String.valueOf(idMedico), String.valueOf(idPaciente)});
+    guardarCSV(ARCHIVO_CITAS, datos, new String[]{"ID", "FechaHora", "Motivo", "IDMedico", "IDPaciente"});
+
+    System.out.println("Cita registrada con ID " + id);
+}
+
+
+    private static void mostrarMedicos() {
+        if (medicos.isEmpty()) {
+            System.out.println("No hay médicos registrados.");
             return;
         }
+        System.out.println("Lista de médicos:");
+        medicos.forEach(m -> System.out.println(m));
+    }
 
+    private static void mostrarPacientes() {
+        if (pacientes.isEmpty()) {
+            System.out.println("No hay pacientes registrados.");
+            return;
+        }
         System.out.println("Lista de pacientes:");
-        for (paciente p : listapaciente) {
-            System.out.println("ID: " + p.id + " | Nombre: " + p.nombre);
-        }
-        System.out.print("Ingrese el ID del paciente para esta cita: ");
-        int idPaciente = entrada.nextInt();
-        entrada.nextLine();
-
-        paciente pacienteSeleccionado = null;
-        for (paciente p : listapaciente) {
-            if (p.id == idPaciente) {
-                pacienteSeleccionado = p;
-                break;
-            }
-        }
-
-        if (pacienteSeleccionado == null) {
-            System.out.println("Paciente no encontrado.");
-            menu();
-            transacciones();
-            return;
-        }
-
-        nuevaCita.doctor = medicoSeleccionado;
-        nuevaCita.paciente = pacienteSeleccionado;
-
-        listacitas.add(nuevaCita);
-        System.out.println("Cita creada exitosamente.");
-
-        menu();
-        transacciones();
+        pacientes.forEach(p -> System.out.println(p));
     }
 
-    static void listarMedicos() {
-        System.out.println("Lista de medicos:");
-        if (listamedico.isEmpty()) {
-            System.out.println("No hay medicos registrados.");
-        } else {
-            for (medico m : listamedico) {
-                System.out.println("ID: " + m.id + " | Nombre: " + m.nombre + " | Especialidad: " + m.especialidad);
-            }
-        }
-        menu();
-        transacciones();
-    }
-
-    static void ListaPacientes() {
-        System.out.println("Lista de pacientes:");
-        if (listapaciente.isEmpty()) {
-            System.out.println("No hay pacientes registrados");
-        } else {
-            for (paciente p : listapaciente) {
-                System.out.println("ID: " + p.id + " | Nombre: " + p.nombre);
-            }
-        }
-        menu();
-        transacciones();
-    }
-
-    static void ListaCitas() {
-        System.out.println("Lista de citas:");
-        if (listacitas.isEmpty()) {
+    private static void mostrarCitas() {
+        if (citas.isEmpty()) {
             System.out.println("No hay citas registradas.");
-        } else {
-            for (cita c : listacitas) {
-                System.out.println("ID: " + c.id +
-                                   " | Fecha: " + c.fecha +
-                                   " | Hora: " + c.hora +
-                                   " | Motivo: " + c.motivo +
-                                   " | Doctor: " + c.doctor.nombre +
-                                   " | Paciente: " + c.paciente.nombre);
-            }
+            return;
         }
-        menu();
-        transacciones();
+        System.out.println("Lista de citas:");
+        citas.forEach(c -> {
+            Medico medico = medicos.stream().filter(m -> m.getId() == c.getIdMedico()).findFirst().orElse(null);
+            Paciente paciente = pacientes.stream().filter(p -> p.getId() == c.getIdPaciente()).findFirst().orElse(null);
+            System.out.println("ID: " + c.getId() +
+                    ", Fecha y Hora: " + c.getFechaHora() +
+                    ", Motivo: " + c.getMotivo() +
+                    ", Médico: " + (medico != null ? medico.getNombre() : "Desconocido") +
+                    ", Paciente: " + (paciente != null ? paciente.getNombre() : "Desconocido"));
+        });
+    }
+
+    private static void guardarCSV(String archivo, List<String[]> datos, String[] encabezado) {
+        boolean existe = new File(archivo).exists();
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo, true))) {
+            if (!existe) {
+                writer.println(String.join(",", encabezado));
+            }
+            for (String[] fila : datos) {
+                writer.println(String.join(",", fila));
+            }
+        } catch (IOException e) {
+            System.out.println("Error al guardar en archivo: " + e.getMessage());
+        }
+    }
+
+    private static void cargarMedicos() {
+        File archivo = new File(ARCHIVO_MEDICOS);
+        if (!archivo.exists()) return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            br.readLine(); // Saltar encabezado
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                int id = Integer.parseInt(partes[0]);
+                String nombre = partes[1];
+                String especialidad = partes[2];
+                medicos.add(new Medico(id, nombre, especialidad));
+            }
+        } catch (IOException e) {
+            System.out.println("Error al cargar médicos: " + e.getMessage());
+        }
+    }
+
+    private static void cargarPacientes() {
+        File archivo = new File(ARCHIVO_PACIENTES);
+        if (!archivo.exists()) return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            br.readLine(); // Saltar encabezado
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                int id = Integer.parseInt(partes[0]);
+                String nombre = partes[1];
+                pacientes.add(new Paciente(id, nombre));
+            }
+        } catch (IOException e) {
+            System.out.println("Error al cargar pacientes: " + e.getMessage());
+        }
+    }
+
+    private static void cargarCitas() {
+        File archivo = new File(ARCHIVO_CITAS);
+        if (!archivo.exists()) return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            br.readLine(); // Saltar encabezado
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                int id = Integer.parseInt(partes[0]);
+                String fechaHora = partes[1];
+                String motivo = partes[2];
+                int idMedico = Integer.parseInt(partes[3]);
+                int idPaciente = Integer.parseInt(partes[4]);
+                citas.add(new Cita(id, fechaHora, motivo, idMedico, idPaciente));
+            }
+        } catch (IOException e) {
+            System.out.println("Error al cargar citas: " + e.getMessage());
+        }
     }
 }
